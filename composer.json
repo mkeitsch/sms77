@@ -1,10 +1,7 @@
 {
     "name": "mkcom/sms77",
-    "type": "typo3-flow-package",
+    "type": "library",
     "description": "Add description here",
-    "require": {
-        "typo3/flow": "*"
-    },
     "autoload": {
         "psr-0": {
             "MKcom\\SMS77": "Classes"
