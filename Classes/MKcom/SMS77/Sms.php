@@ -13,20 +13,14 @@ namespace MKcom\SMS77;
 class Sms
 {
 
-    const SMS_TYPE_BASIC = 'basic';
-    const SMS_TYPE_BASICPLUS = 'basicplus';
-    const SMS_TYPE_QUALITY = 'quality';
-    const SMS_TYPE_DIRECT = 'direct';
+    const SMS_DELIVERY_TYPE_BASIC = 'basicplus';
+    const SMS_DELIVERY_TYPE_QUALITY = 'quality';
+    const SMS_DELIVERY_TYPE_DIRECT = 'direct';
 
-    const SMS_STATUS_TRANSMITTED = 'transmitted';
-    const SMS_STATUS_DELIVERED = 'delivered';
-    const SMS_STATUS_NOT_DELIVERED = 'not delivered';
-    const SMS_STATUS_BUFFERED = 'buffered';
-
-    /**
-     * @var string
-     */
-    protected $messageId;
+    const SMS_DELIVERY_STATUS_TRANSMITTED = 'TRANSMITTED';
+    const SMS_DELIVERY_STATUS_DELIVERED = 'DELIVERED';
+    const SMS_DELIVERY_STATUS_NOT_DELIVERED = 'NOTDELIVERED';
+    const SMS_DELIVERY_STATUS_BUFFERED = 'BUFFERED';
 
     /**
      * @var string
@@ -56,7 +50,12 @@ class Sms
     /**
      * @var boolean
      */
-    protected $unicodeSms;
+    protected $unicodeTextEncoding;
+
+    /**
+     * @var boolean
+     */
+    protected $utf8TextEncoding;
 
     /**
      * @var boolean
@@ -68,20 +67,34 @@ class Sms
      */
     protected $dummySms;
 
-    /**
-     * @var boolean
-     */
-    protected $utf8;
+    /* ********************[  ]******************** */
 
     /**
      * @var string
      */
-    protected $status;
+    protected $deliveryStatus;
 
     /**
      * @var int
      */
-    protected $statusTimestamp;
+    protected $deliveryStatusTimestamp;
+
+    /**
+     * @var string
+     */
+    protected $messageId;
+
+    /**
+     * @var boolean
+     */
+    protected $sent;
+
+    /**
+     * @var array
+     */
+    protected $gatewayResponse;
+
+    /* ********************[ GETTER / SETTER ]******************** */
 
     /**
      * @return string
@@ -93,7 +106,6 @@ class Sms
 
     /**
      * @param string $messageId
-     * @return void
      */
     public function setMessageId($messageId)
     {
@@ -110,7 +122,6 @@ class Sms
 
     /**
      * @param string $sender
-     * @return void
      */
     public function setSender($sender)
     {
@@ -127,7 +138,6 @@ class Sms
 
     /**
      * @param array $recipients
-     * @return void
      */
     public function setRecipients($recipients)
     {
@@ -144,7 +154,6 @@ class Sms
 
     /**
      * @param string $message
-     * @return void
      */
     public function setMessage($message)
     {
@@ -161,7 +170,6 @@ class Sms
 
     /**
      * @param string $smsType
-     * @return void
      */
     public function setSmsType($smsType)
     {
@@ -178,7 +186,6 @@ class Sms
 
     /**
      * @param int $delayedDeliveryTimestamp
-     * @return void
      */
     public function setDelayedDeliveryTimestamp($delayedDeliveryTimestamp)
     {
@@ -188,18 +195,17 @@ class Sms
     /**
      * @return boolean
      */
-    public function isUnicodeSms()
+    public function isUnicodeTextEncoding()
     {
-        return $this->unicodeSms;
+        return $this->unicodeTextEncoding;
     }
 
     /**
-     * @param boolean $unicodeSms
-     * @return void
+     * @param boolean $unicodeTextEncoding
      */
-    public function setUnicodeSms($unicodeSms)
+    public function setUnicodeTextEncoding($unicodeTextEncoding)
     {
-        $this->unicodeSms = $unicodeSms;
+        $this->unicodeTextEncoding = $unicodeTextEncoding;
     }
 
     /**
@@ -212,7 +218,6 @@ class Sms
 
     /**
      * @param boolean $flashSms
-     * @return void
      */
     public function setFlashSms($flashSms)
     {
@@ -229,7 +234,6 @@ class Sms
 
     /**
      * @param boolean $dummySms
-     * @return void
      */
     public function setDummySms($dummySms)
     {
@@ -239,60 +243,92 @@ class Sms
     /**
      * @return boolean
      */
-    public function isUtf8()
+    public function isUtf8TextEncoding()
     {
-        return $this->utf8;
+        return $this->utf8TextEncoding;
     }
 
     /**
-     * @param boolean $utf8
-     * @return void
+     * @param boolean $utf8TextEncoding
      */
-    public function setUtf8($utf8)
+    public function setUtf8TextEncoding($utf8TextEncoding)
     {
-        $this->utf8 = $utf8;
+        $this->utf8TextEncoding = $utf8TextEncoding;
     }
 
     /**
      * @return string
      */
-    public function getStatus()
+    public function getDeliveryStatus()
     {
-        return $this->status;
+        return $this->deliveryStatus;
     }
 
     /**
-     * @param string $status
-     * @return void
+     * @param string $deliveryStatus
      */
-    public function setStatus($status)
+    public function setDeliveryStatus($deliveryStatus)
     {
-        $this->status = $status;
+        $this->deliveryStatus = $deliveryStatus;
     }
 
     /**
      * @return int
      */
-    public function getStatusTimestamp()
+    public function getDeliveryStatusTimestamp()
     {
-        return $this->statusTimestamp;
+        return $this->deliveryStatusTimestamp;
     }
 
     /**
-     * @param int $statusTimestamp
+     * @param int $deliveryStatusTimestamp
+     */
+    public function setDeliveryStatusTimestamp($deliveryStatusTimestamp)
+    {
+        $this->deliveryStatusTimestamp = $deliveryStatusTimestamp;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isSent()
+    {
+        return $this->sent;
+    }
+
+    /**
+     * @param boolean $sent
      * @return void
      */
-    public function setStatusTimestamp($statusTimestamp)
+    public function setSent($sent)
     {
-        $this->statusTimestamp = $statusTimestamp;
+        $this->sent = $sent;
     }
+
+    /**
+     * @return array
+     */
+    public function getGatewayResponse()
+    {
+        return $this->gatewayResponse;
+    }
+
+    /**
+     * @param array $gatewayResponse
+     */
+    public function setGatewayResponse($gatewayResponse)
+    {
+        $this->gatewayResponse = $gatewayResponse;
+    }
+
+    /* ********************[ SPECIAL METHODS ]******************** */
 
     /**
      * @return boolean
      */
     public function isDelivered()
     {
-        if ($this->status === self::SMS_STATUS_DELIVERED) {
+        if ($this->deliveryStatus === self::SMS_DELIVERY_STATUS_DELIVERED) {
             return true;
         } else {
             return false;
@@ -300,12 +336,21 @@ class Sms
     }
 
     /**
+     * @param GatewayInterface $gateway
      * @return mixed
      */
-    public function send()
+    public function send(GatewayInterface $gateway)
     {
-        $gatewayService = GatewayService::getInstance();
-        return $gatewayService->sendSms($this);
+        return $gateway->send($this);
+    }
+
+    public function __clone()
+    {
+        $this->sent = NULL;
+        $this->messageId = NULL;
+        $this->deliveryStatus = NULL;
+        $this->deliveryStatusTimestamp = NULL;
+        $this->gatewayResponse = NULL;
     }
 
 }

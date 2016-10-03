@@ -2,6 +2,9 @@
     "name": "mkcom/sms77",
     "type": "library",
     "description": "Add description here",
+    "require": {
+        "codezero/curl": "~1.1"
+    },
     "autoload": {
         "psr-0": {
             "MKcom\\SMS77": "Classes"
