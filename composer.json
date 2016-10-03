@@ -1,13 +1,23 @@
 {
     "name": "mkcom/sms77",
+    "description": "Easy usage of the SMS77 HTTP API with PHP",
     "type": "library",
-    "description": "Add description here",
     "require": {
         "codezero/curl": "~1.1"
     },
     "autoload": {
         "psr-0": {
-            "MKcom\\SMS77": "Classes"
+            "MKcom\\SMS77\\": "Classes"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "MKcom\\SMS77\\Tests\\": "Tests"
+        }
+    },
+    "extra": {
+        "neos": {
+            "package-key": "MKcom.SMS77"
         }
     }
 }
