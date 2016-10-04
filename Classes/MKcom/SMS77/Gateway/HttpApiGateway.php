@@ -22,57 +22,62 @@ class HttpApiGateway implements GatewayInterface
 {
 
     const SMS77_HTTP_API_GATEWAY_STATUS_CODES = array(
-        '100' => '100: SMS delivered successfully',
-        '101' => '101: Delivery to at least one recipient failed',
-        '201' => '201: Sender illegal', // max. 11 alpha-numeric or 16 numeric ciphers
-        '202' => '202: Recipient number illegal',
-        '300' => '300: Missing username or password',
-        '301' => '301: Argument "to" missing',
-        '304' => '304: Argument "type" missing',
-        '305' => '305: Argument "text" missing',
-        '306' => '306: Sender number illegal',
-        '307' => '307: Argument "url" missing',
-        '400' => '400: Argument "type" invalid',
-        '401' => '401: Argument "text" too long',
-        '402' => '402: Reload lock - same SMS sent within 90 seconds',
-        '500' => '500: Not enough credits',
-        '600' => '600: Carrier delivery failed',
-        '700' => '700: Unknown error',
-        '801' => '801: Logo file not set',
-        '802' => '802: Logo file does not exist',
-        '803' => '803: Ring tone not set',
-        '900' => '900: Given credentials not valid',
-        '901' => '901: Message ID invalid',
-        '902' => '902: HTTP API not activated for this account',
-        '903' => '903: Server IP invalid',
-        '11'  => '11: SMS carrier temporarily not available',
-        '0'   => 'Error: Status code does not exist'
+        100 => '100: SMS delivered successfully',
+        101 => '101: Delivery to at least one recipient failed',
+        201 => '201: Sender illegal', // max. 11 alpha-numeric or 16 numeric ciphers
+        202 => '202: Recipient number illegal',
+        300 => '300: Missing username or password',
+        301 => '301: Argument "to" missing',
+        304 => '304: Argument "type" missing',
+        305 => '305: Argument "text" missing',
+        306 => '306: Sender number illegal',
+        307 => '307: Argument "url" missing',
+        400 => '400: Argument "type" invalid',
+        401 => '401: Argument "text" too long',
+        402 => '402: Reload lock - same SMS sent within 90 seconds',
+        500 => '500: Not enough credits',
+        600 => '600: Carrier delivery failed',
+        700 => '700: Unknown error',
+        801 => '801: Logo file not set',
+        802 => '802: Logo file does not exist',
+        803 => '803: Ring tone not set',
+        900 => '900: Given credentials not valid',
+        901 => '901: Message ID invalid',
+        902 => '902: HTTP API not activated for this account',
+        903 => '903: Server IP invalid',
+        11  => '11: SMS carrier temporarily not available',
+        0   => 'Error: Status code does not exist'
     );
 
     const SMS77_HTTP_API_GATEWAY_DEFAULTS = array(
+        'returnMessageId'            => false,
+        'resendLock'                 => false,
+        'detailedOutput'             => false,
         'defaultSender'              => '',
         'defaultSmsType'             => Sms::SMS_DELIVERY_TYPE_BASIC,
-        'defaultUnicodeTextEncoding' => FALSE,
-        'defaultUtf8TextEncoding'    => FALSE,
-        'defaultFlashSmsDelivery'    => FALSE,
-        'defaultDummySmsDelivery'    => FALSE,
+        'defaultUnicodeTextEncoding' => false,
+        'defaultUtf8TextEncoding'    => false,
+        'defaultFlashSmsDelivery'    => false,
+        'defaultDummySmsDelivery'    => false,
     );
 
     const DEFAULT_CONFIGURATION = array(
         'smsDeliveryUrl'             => 'https://gateway.sms77.de/',
         'creditStatusUrl'            => 'https://gateway.sms77.de/balance.php',
         'messageStatusUrl'           => 'https://gateway.sms77.de/status.php',
+        // Gateway Settings
         'username'                   => '',
         'password'                   => '',
-        'returnMessageId'            => TRUE,
-        'resendLock'                 => TRUE,
-        'detailedOutput'             => TRUE,
+        'returnMessageId'            => true,
+        'resendLock'                 => true,
+        'detailedOutput'             => true,
+        // SMS Defaults
         'defaultSender'              => '',
         'defaultSmsType'             => Sms::SMS_DELIVERY_TYPE_BASIC,
-        'defaultUnicodeTextEncoding' => FALSE,
-        'defaultUtf8TextEncoding'    => FALSE,
-        'defaultFlashSmsDelivery'    => FALSE,
-        'defaultDummySmsDelivery'    => FALSE,
+        'defaultUnicodeTextEncoding' => false,
+        'defaultUtf8TextEncoding'    => false,
+        'defaultFlashSmsDelivery'    => false,
+        'defaultDummySmsDelivery'    => false,
     );
 
     /* ********************[ GATEWAY INTERNAL FIELDS ]******************** */
@@ -168,18 +173,6 @@ class HttpApiGateway implements GatewayInterface
      */
     protected $defaultDummySmsDelivery;
 
-    /* ********************[ LAST STATUS ]******************** */
-
-    /**
-     * @var int
-     */
-    protected $lastStatusCode;
-
-    /**
-     * @var string
-     */
-    protected $lastStatusMessage;
-
     /* ********************[ METHODS ]******************** */
 
     /**
@@ -221,30 +214,13 @@ class HttpApiGateway implements GatewayInterface
         }
     }
 
-    /* ********************[ LAST STATUS METHODS ]******************** */
-
-    /**
-     * @return int
-     */
-    public function getLastStatusCode()
-    {
-        return $this->lastStatusCode;
-    }
-
-    /**
-     * @return string
-     */
-    public function getLastStatusMessage()
-    {
-        return $this->lastStatusMessage;
-    }
-
     /* ********************[ GATEWAY SERVICE METHODS ]******************** */
 
     /**
      * @param Sms $sms
      * @return Sms
      * @throws Sms77HttpApiGatewayException
+     * @throws \Exception
      */
     public function send(Sms $sms)
     {
@@ -256,22 +232,22 @@ class HttpApiGateway implements GatewayInterface
 
         // Set configuration
 
-        if (empty($sms->getSender())) {
+        if (is_null($sms->getSender())) {
             $sms->setSender($this->defaultSender);
         }
-        if (empty($sms->getSmsType())) {
+        if (is_null($sms->getSmsType())) {
             $sms->setSmsType($this->defaultSmsType);
         }
-        if (empty($sms->isUnicodeTextEncoding())) {
+        if (is_null($sms->isUnicodeTextEncoding())) {
             $sms->setUnicodeTextEncoding($this->defaultUnicodeTextEncoding);
         }
-        if (empty($sms->isUtf8TextEncoding())) {
+        if (is_null($sms->isUtf8TextEncoding())) {
             $sms->setUtf8TextEncoding($this->defaultUtf8TextEncoding);
         }
-        if (empty($sms->isFlashSms())) {
+        if (is_null($sms->isFlashSms())) {
             $sms->setFlashSms($this->defaultFlashSmsDelivery);
         }
-        if (empty($sms->isDummySms())) {
+        if (is_null($sms->isDummySms())) {
             $sms->setDummySms($this->defaultDummySmsDelivery);
         }
 
@@ -281,12 +257,33 @@ class HttpApiGateway implements GatewayInterface
 
         $postParameters['u'] = $this->username;
         $postParameters['p'] = $this->password;
-        $postParameters['return_msg_id'] = (int)$this->returnMessageId;
-        $postParameters['no_reload'] = (int)!$this->resendLock;
-        $postParameters['details'] = (int)$this->detailedOutput;
+
+
+        if ($this->returnMessageId !== self::SMS77_HTTP_API_GATEWAY_DEFAULTS['returnMessageId']) {
+            $postParameters['return_msg_id'] = (int)$this->returnMessageId;
+        }
+        if ($this->resendLock !== self::SMS77_HTTP_API_GATEWAY_DEFAULTS['resendLock']) {
+            $postParameters['no_reload'] = (int)$this->resendLock;
+        }
+        if ($this->detailedOutput !== self::SMS77_HTTP_API_GATEWAY_DEFAULTS['detailedOutput']) {
+            $postParameters['details'] = (int)$this->detailedOutput;
+        }
+
+
+        if (!is_array($sms->getRecipients())) {
+            $sms->setRecipients(array());
+        }
+
+        $postParameters['text'] = $sms->getMessage();
+        $postParameters['to'] = implode(',', $sms->getRecipients());
+
+        if (!is_null($sms->getDelayedDeliveryTimestamp())) {
+            $postParameters['delay'] = $sms->getDelayedDeliveryTimestamp();
+        }
+
 
         if ($sms->getSender() !== self::SMS77_HTTP_API_GATEWAY_DEFAULTS['defaultSender']) {
-            $postParameters['sender'] = $sms->getSender();
+            $postParameters['from'] = $sms->getSender();
         }
         if ($sms->getSmsType() !== self::SMS77_HTTP_API_GATEWAY_DEFAULTS['defaultSmsType']) {
             $postParameters['type'] = $sms->getSmsType();
@@ -310,23 +307,27 @@ class HttpApiGateway implements GatewayInterface
 
         // Parse response
 
-        if (is_numeric($responseContent) && $responseContent != 100 && in_array($responseContent, self::SMS77_HTTP_API_GATEWAY_STATUS_CODES)) {
-            throw new Sms77HttpApiGatewayException(self::SMS77_HTTP_API_GATEWAY_STATUS_CODES[$responseContent], 1475485924);
+        if (is_numeric($responseContent)) {
+            $responseContent = (int) $responseContent;
+            if ($responseContent !== 100 && in_array($responseContent, self::SMS77_HTTP_API_GATEWAY_STATUS_CODES)) {
+                throw new Sms77HttpApiGatewayException(self::SMS77_HTTP_API_GATEWAY_STATUS_CODES[$responseContent], 1475485924);
+            }
+        } elseif (strpos($responseContent, "\n") !== false) {
+            if ($this->returnMessageId) {
+                $responseContentExploded = explode("\n", $responseContent);
+                $sms->setMessageId($responseContentExploded[1]);
+
+                // Get current delivery status
+
+                try {
+                    $sms = $this->getMessageStatus($sms);
+                } catch (Sms77HttpApiGatewayException $e) {}
+            }
+        } else {
+            throw new \Exception('Response parsing error', 1475572670);
         }
 
-        $responseContentExploded = explode("\n", $responseContent);
-
-        $this->lastStatusCode = in_array($responseContentExploded[0], self::SMS77_HTTP_API_GATEWAY_STATUS_CODES) ? $responseContentExploded[0] : 0;
-        $this->lastStatusMessage = $this->lastStatusCode === 0 ?: self::SMS77_HTTP_API_GATEWAY_STATUS_CODES[$this->lastStatusCode];
-
-        $sms->setMessageId($responseContentExploded[1]);
         $sms->setGatewayResponse($responseContent);
-
-        // Get current delivery status
-
-        try {
-            $sms = $this->getMessageStatus($sms);
-        } catch (Sms77HttpApiGatewayException $e) {}
 
         return $sms;
     }
@@ -360,6 +361,7 @@ class HttpApiGateway implements GatewayInterface
      * @param Sms|string $message SMS object or message id
      * @return Sms
      * @throws Sms77HttpApiGatewayException
+     * @throws \Exception
      */
     public function getMessageStatus($message)
     {
@@ -369,20 +371,27 @@ class HttpApiGateway implements GatewayInterface
             $messageId = $message;
         }
 
-        $responseContent = $this->requestEngine->get($this->creditStatusUrl, array(
+        $responseContent = $this->requestEngine->get($this->messageStatusUrl, array(
             'u' => $this->username,
             'p' => $this->password,
             'msg_id' => $messageId,
         ));
 
-        if (is_numeric($responseContent) && $responseContent != 100 && in_array($responseContent, self::SMS77_HTTP_API_GATEWAY_STATUS_CODES)) {
-            throw new Sms77HttpApiGatewayException(self::SMS77_HTTP_API_GATEWAY_STATUS_CODES[$responseContent], 1475484843);
+        if (is_numeric($responseContent)) {
+            $responseContent = (int)$responseContent;
+            if ($responseContent !== 100 && in_array($responseContent, self::SMS77_HTTP_API_GATEWAY_STATUS_CODES)) {
+                throw new Sms77HttpApiGatewayException(self::SMS77_HTTP_API_GATEWAY_STATUS_CODES[$responseContent], 1475574023);
+            } else {
+                throw new \Exception('Response parsing error', 1475574032);
+            }
+        } elseif (strpos($responseContent, "\n") !== false) {
+            $responseContentExploded = explode("\n", $responseContent);
+
+            $deliveryStatus = $responseContentExploded[0];
+            $deliveryStatusTimestamp = $responseContentExploded[1];
+        } else {
+            throw new \Exception('Response parsing error', 1475574038);
         }
-
-        $responseContent = explode("\n", $responseContent);
-
-        $deliveryStatus = $responseContent[0];
-        $deliveryStatusTimestamp = $responseContent[1];
 
         if (! $message instanceof Sms) {
             $message = new Sms();

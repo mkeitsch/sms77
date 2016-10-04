@@ -1,6 +1,6 @@
 {
     "name": "mkcom/sms77",
-    "description": "Easy usage of the SMS77 HTTP API with PHP",
+    "description": "Easy usage of the SMS77 HTTP API",
     "type": "library",
     "require": {
         "codezero/curl": "~1.1"

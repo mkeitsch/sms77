@@ -28,7 +28,7 @@ class Sms
     protected $sender;
 
     /**
-     * @var array()
+     * @var array
      */
     protected $recipients;
 
