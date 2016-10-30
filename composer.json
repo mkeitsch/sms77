@@ -1,18 +1,23 @@
 {
     "name": "mkcom/sms77",
-    "description": "Easy usage of the SMS77 HTTP API",
     "type": "library",
+    "description": "Easy usage of the SMS77 HTTP API",
+    "homepage": "https://github.com/mkeitsch/sms77",
+    "license": "MIT",
     "require": {
         "codezero/curl": "~1.1"
     },
+    "require-dev": {
+        "phpunit/phpunit": "^5.6"
+    },
     "autoload": {
-        "psr-0": {
-            "MKcom\\SMS77\\": "Classes"
+        "psr-4": {
+            "MKcom\\SMS77\\": "Classes/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "MKcom\\SMS77\\Tests\\": "Tests"
+            "MKcom\\SMS77\\Tests\\": "Tests/"
         }
     },
     "extra": {
