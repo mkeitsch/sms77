@@ -337,13 +337,16 @@ class Sms
 
     /**
      * @param GatewayInterface $gateway
-     * @return mixed
+     * @return Sms
      */
     public function send(GatewayInterface $gateway)
     {
         return $gateway->send($this);
     }
 
+    /**
+     * @return void
+     */
     public function __clone()
     {
         $this->sent = NULL;

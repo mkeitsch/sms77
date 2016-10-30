@@ -389,6 +389,8 @@ class HttpApiGateway implements GatewayInterface
 
             $deliveryStatus = $responseContentExploded[0];
             $deliveryStatusTimestamp = $responseContentExploded[1];
+        } elseif (empty($responseContent)) {
+            throw new \Exception('Response is empty', 1477317469);
         } else {
             throw new \Exception('Response parsing error', 1475574038);
         }

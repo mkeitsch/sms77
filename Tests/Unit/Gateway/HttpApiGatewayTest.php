@@ -3,6 +3,8 @@ namespace MKcom\SMS77\Tests\Unit\Gateway;
 
 /*
  * This file is part of the MKcom.SMS77 package.
+ *
+ * TODO: PHPUnit can mock web services
  */
 
 use MKcom\SMS77\Gateway\Exception\Sms77HttpApiGatewayException;
