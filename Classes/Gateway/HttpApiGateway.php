@@ -79,7 +79,7 @@ class HttpApiGateway implements GatewayInterface
     );
 
     /**
-     * @var self
+     * @var static
      */
     protected static $instance;
 
@@ -169,14 +169,14 @@ class HttpApiGateway implements GatewayInterface
     /**
      * @param RequestEngineInterface $requestEngine
      * @param array $configuration
-     * @return self
+     * @return static
      */
     public static function getInstance(RequestEngineInterface $requestEngine, array $configuration = array())
     {
-        if (self::$instance === NULL) {
-            self::$instance = new self($requestEngine, $configuration);
+        if (!static::$instance instanceof static) {
+            static::$instance = new static($requestEngine, $configuration);
         }
-        return self::$instance;
+        return static::$instance;
     }
 
     /**
@@ -187,15 +187,11 @@ class HttpApiGateway implements GatewayInterface
      */
     public function __construct(RequestEngineInterface $requestEngine, array $configuration = array())
     {
-        if (self::$instance === NULL) {
-            self::$instance = $this;
-        }
-
         $this->requestEngine = $requestEngine;
-        $this->configuration = array_merge(self::DEFAULT_CONFIGURATION, $configuration);
+        $this->configuration = array_merge(static::DEFAULT_CONFIGURATION, $configuration);
 
         foreach ($this->configuration as $key => $value) {
-            if (property_exists(self::class, $key)) {
+            if (property_exists(static::class, $key)) {
                 $this->$key = $value;
             }
         }
@@ -239,13 +235,13 @@ class HttpApiGateway implements GatewayInterface
         $postParameters['u'] = $this->username;
         $postParameters['p'] = $this->password;
 
-        if ($this->returnMessageId !== self::SMS77_HTTP_API_GATEWAY_DEFAULT_SETTINGS['returnMessageId']) {
+        if ($this->returnMessageId !== static::SMS77_HTTP_API_GATEWAY_DEFAULT_SETTINGS['returnMessageId']) {
             $postParameters['return_msg_id'] = (int)$this->returnMessageId;
         }
-        if ($this->resendLock !== self::SMS77_HTTP_API_GATEWAY_DEFAULT_SETTINGS['resendLock']) {
+        if ($this->resendLock !== static::SMS77_HTTP_API_GATEWAY_DEFAULT_SETTINGS['resendLock']) {
             $postParameters['no_reload'] = (int)$this->resendLock;
         }
-        if ($this->detailedOutput !== self::SMS77_HTTP_API_GATEWAY_DEFAULT_SETTINGS['detailedOutput']) {
+        if ($this->detailedOutput !== static::SMS77_HTTP_API_GATEWAY_DEFAULT_SETTINGS['detailedOutput']) {
             $postParameters['details'] = (int)$this->detailedOutput;
         }
 
@@ -256,22 +252,22 @@ class HttpApiGateway implements GatewayInterface
             $postParameters['delay'] = $sms->getDelayedDeliveryTimestamp();
         }
 
-        if ($sms->getSender() !== self::SMS77_HTTP_API_GATEWAY_DEFAULT_SETTINGS['defaultSender']) {
+        if ($sms->getSender() !== static::SMS77_HTTP_API_GATEWAY_DEFAULT_SETTINGS['defaultSender']) {
             $postParameters['from'] = $sms->getSender();
         }
-        if ($sms->getSmsType() !== self::SMS77_HTTP_API_GATEWAY_DEFAULT_SETTINGS['defaultSmsType']) {
+        if ($sms->getSmsType() !== static::SMS77_HTTP_API_GATEWAY_DEFAULT_SETTINGS['defaultSmsType']) {
             $postParameters['type'] = $sms->getSmsType();
         }
-        if ($sms->isUnicodeTextEncoding() !== self::SMS77_HTTP_API_GATEWAY_DEFAULT_SETTINGS['defaultUnicodeTextEncoding']) {
+        if ($sms->isUnicodeTextEncoding() !== static::SMS77_HTTP_API_GATEWAY_DEFAULT_SETTINGS['defaultUnicodeTextEncoding']) {
             $postParameters['unicode'] = (int)$sms->isUnicodeTextEncoding();
         }
-        if ($sms->isUtf8TextEncoding() !== self::SMS77_HTTP_API_GATEWAY_DEFAULT_SETTINGS['defaultUtf8TextEncoding']) {
+        if ($sms->isUtf8TextEncoding() !== static::SMS77_HTTP_API_GATEWAY_DEFAULT_SETTINGS['defaultUtf8TextEncoding']) {
             $postParameters['utf8'] = (int)$sms->isUtf8TextEncoding();
         }
-        if ($sms->isFlashSms() !== self::SMS77_HTTP_API_GATEWAY_DEFAULT_SETTINGS['defaultFlashSmsDelivery']) {
+        if ($sms->isFlashSms() !== static::SMS77_HTTP_API_GATEWAY_DEFAULT_SETTINGS['defaultFlashSmsDelivery']) {
             $postParameters['flash'] = (int)$sms->isFlashSms();
         }
-        if ($sms->isDummySms() !== self::SMS77_HTTP_API_GATEWAY_DEFAULT_SETTINGS['defaultDummySmsDelivery']) {
+        if ($sms->isDummySms() !== static::SMS77_HTTP_API_GATEWAY_DEFAULT_SETTINGS['defaultDummySmsDelivery']) {
             $postParameters['debug'] = (int)$sms->isDummySms();
         }
 
@@ -279,8 +275,8 @@ class HttpApiGateway implements GatewayInterface
 
         if (is_numeric($responseContent)) {
             $responseContent = (int) $responseContent;
-            if ($responseContent !== 100 && in_array($responseContent, self::SMS77_HTTP_API_GATEWAY_STATUS_CODES)) {
-                throw new Sms77HttpApiGatewayException(self::SMS77_HTTP_API_GATEWAY_STATUS_CODES[$responseContent], 1475485924);
+            if ($responseContent !== 100 && in_array($responseContent, static::SMS77_HTTP_API_GATEWAY_STATUS_CODES)) {
+                throw new Sms77HttpApiGatewayException(static::SMS77_HTTP_API_GATEWAY_STATUS_CODES[$responseContent], 1475485924);
             }
         } elseif (strpos($responseContent, "\n") !== false) {
             if ($this->returnMessageId) {
@@ -331,8 +327,8 @@ class HttpApiGateway implements GatewayInterface
 
         if (is_numeric($responseContent)) {
             $responseContent = (int)$responseContent;
-            if ($responseContent !== 100 && in_array($responseContent, self::SMS77_HTTP_API_GATEWAY_STATUS_CODES)) {
-                throw new Sms77HttpApiGatewayException(self::SMS77_HTTP_API_GATEWAY_STATUS_CODES[$responseContent], 1475574023);
+            if ($responseContent !== 100 && in_array($responseContent, static::SMS77_HTTP_API_GATEWAY_STATUS_CODES)) {
+                throw new Sms77HttpApiGatewayException(static::SMS77_HTTP_API_GATEWAY_STATUS_CODES[$responseContent], 1475574023);
             } else {
                 throw new \Exception('Response parsing error', 1475574032);
             }
@@ -368,8 +364,8 @@ class HttpApiGateway implements GatewayInterface
         $responseContent = floatval($responseContent);
 
         if ($responseContent && intval($responseContent) == $responseContent) {
-            if (is_numeric($responseContent) && in_array($responseContent, self::SMS77_HTTP_API_GATEWAY_STATUS_CODES)) {
-                throw new Sms77HttpApiGatewayException(self::SMS77_HTTP_API_GATEWAY_STATUS_CODES[$responseContent], 1475484835);
+            if (is_numeric($responseContent) && in_array($responseContent, static::SMS77_HTTP_API_GATEWAY_STATUS_CODES)) {
+                throw new Sms77HttpApiGatewayException(static::SMS77_HTTP_API_GATEWAY_STATUS_CODES[$responseContent], 1475484835);
             }
         }
 

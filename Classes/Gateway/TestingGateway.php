@@ -24,7 +24,7 @@ class TestingGateway implements GatewayInterface
     );
 
     /**
-     * @var self
+     * @var static
      */
     protected static $instance;
 
@@ -39,24 +39,14 @@ class TestingGateway implements GatewayInterface
     protected $gatewayResponse;
 
     /**
-     * @return self
+     * @return static
      */
     public static function getInstance()
     {
-        if (self::$instance === null) {
-            self::$instance = new self();
+        if (!static::$instance instanceof static) {
+            static::$instance = new static();
         }
-        return self::$instance;
-    }
-
-    /**
-     * TestingGateway constructor.
-     */
-    public function __construct()
-    {
-        if (self::$instance === null) {
-            self::$instance = $this;
-        }
+        return static::$instance;
     }
 
     /**
@@ -83,7 +73,7 @@ class TestingGateway implements GatewayInterface
      */
     public function send(Sms &$sms)
     {
-        if (empty($this->deliveryStatus) || !in_array($this->deliveryStatus, self::AVAILABLE_DELIVERY_STATUSES)) {
+        if (empty($this->deliveryStatus) || !in_array($this->deliveryStatus, static::AVAILABLE_DELIVERY_STATUSES)) {
             $this->deliveryStatus = Sms::SMS_DELIVERY_STATUS_DELIVERED;
         }
 

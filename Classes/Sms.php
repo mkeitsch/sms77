@@ -362,7 +362,7 @@ class Sms
      */
     public function isDelivered()
     {
-        if ($this->deliveryStatus === self::SMS_DELIVERY_STATUS_DELIVERED) {
+        if ($this->deliveryStatus === static::SMS_DELIVERY_STATUS_DELIVERED) {
             return true;
         } else {
             return false;

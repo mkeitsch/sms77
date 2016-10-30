@@ -19,6 +19,22 @@ class SimpleCurl implements RequestEngineInterface
 {
 
     /**
+     * @var static
+     */
+    protected static $instance;
+
+    /**
+     * @return static
+     */
+    public static function getInstance()
+    {
+        if (!static::$instance instanceof static) {
+            static::$instance = new static();
+        }
+        return static::$instance;
+    }
+
+    /**
      * @param string $url
      * @param array $getParameters
      * @return string response body
