@@ -28,7 +28,7 @@ class Sms
     protected $sender;
 
     /**
-     * @var array
+     * @var array<string>
      */
     protected $recipients;
 
@@ -67,8 +67,6 @@ class Sms
      */
     protected $dummySms;
 
-    /* ********************[  ]******************** */
-
     /**
      * @var string
      */
@@ -90,27 +88,9 @@ class Sms
     protected $sent;
 
     /**
-     * @var array
+     * @var string
      */
     protected $gatewayResponse;
-
-    /* ********************[ GETTER / SETTER ]******************** */
-
-    /**
-     * @return string
-     */
-    public function getMessageId()
-    {
-        return $this->messageId;
-    }
-
-    /**
-     * @param string $messageId
-     */
-    public function setMessageId($messageId)
-    {
-        $this->messageId = $messageId;
-    }
 
     /**
      * @return string
@@ -122,10 +102,11 @@ class Sms
 
     /**
      * @param string $sender
+     * @return void
      */
     public function setSender($sender)
     {
-        $this->sender = $sender;
+        $this->sender = (string)$sender;
     }
 
     /**
@@ -138,10 +119,20 @@ class Sms
 
     /**
      * @param array $recipients
+     * @return void
      */
-    public function setRecipients($recipients)
+    public function setRecipients(array $recipients)
     {
         $this->recipients = $recipients;
+    }
+
+    /**
+     * @param $recipient
+     * @return void
+     */
+    public function addRecipient($recipient)
+    {
+        $this->recipients[] = (string)$recipient;
     }
 
     /**
@@ -154,10 +145,11 @@ class Sms
 
     /**
      * @param string $message
+     * @return void
      */
     public function setMessage($message)
     {
-        $this->message = $message;
+        $this->message = (string)$message;
     }
 
     /**
@@ -170,10 +162,11 @@ class Sms
 
     /**
      * @param string $smsType
+     * @return void
      */
     public function setSmsType($smsType)
     {
-        $this->smsType = $smsType;
+        $this->smsType = (string)$smsType;
     }
 
     /**
@@ -186,10 +179,20 @@ class Sms
 
     /**
      * @param int $delayedDeliveryTimestamp
+     * @return void
      */
     public function setDelayedDeliveryTimestamp($delayedDeliveryTimestamp)
     {
-        $this->delayedDeliveryTimestamp = $delayedDeliveryTimestamp;
+        $this->delayedDeliveryTimestamp = (int)$delayedDeliveryTimestamp;
+    }
+
+    /**
+     * @param \DateTime $delayedDeliveryDateTime
+     * @return void
+     */
+    public function setDelayedDeliveryDateTime(\DateTime $delayedDeliveryDateTime)
+    {
+        $this->delayedDeliveryTimestamp = $delayedDeliveryDateTime->getTimestamp();
     }
 
     /**
@@ -202,10 +205,11 @@ class Sms
 
     /**
      * @param boolean $unicodeTextEncoding
+     * @return void
      */
     public function setUnicodeTextEncoding($unicodeTextEncoding)
     {
-        $this->unicodeTextEncoding = $unicodeTextEncoding;
+        $this->unicodeTextEncoding = (boolean)$unicodeTextEncoding;
     }
 
     /**
@@ -218,10 +222,11 @@ class Sms
 
     /**
      * @param boolean $flashSms
+     * @return void
      */
     public function setFlashSms($flashSms)
     {
-        $this->flashSms = $flashSms;
+        $this->flashSms = (boolean)$flashSms;
     }
 
     /**
@@ -234,10 +239,11 @@ class Sms
 
     /**
      * @param boolean $dummySms
+     * @return void
      */
     public function setDummySms($dummySms)
     {
-        $this->dummySms = $dummySms;
+        $this->dummySms = (boolean)$dummySms;
     }
 
     /**
@@ -250,10 +256,11 @@ class Sms
 
     /**
      * @param boolean $utf8TextEncoding
+     * @return void
      */
     public function setUtf8TextEncoding($utf8TextEncoding)
     {
-        $this->utf8TextEncoding = $utf8TextEncoding;
+        $this->utf8TextEncoding = (boolean)$utf8TextEncoding;
     }
 
     /**
@@ -266,10 +273,11 @@ class Sms
 
     /**
      * @param string $deliveryStatus
+     * @return void
      */
     public function setDeliveryStatus($deliveryStatus)
     {
-        $this->deliveryStatus = $deliveryStatus;
+        $this->deliveryStatus = (string)$deliveryStatus;
     }
 
     /**
@@ -282,10 +290,37 @@ class Sms
 
     /**
      * @param int $deliveryStatusTimestamp
+     * @return void
      */
     public function setDeliveryStatusTimestamp($deliveryStatusTimestamp)
     {
-        $this->deliveryStatusTimestamp = $deliveryStatusTimestamp;
+        $this->deliveryStatusTimestamp = (int)$deliveryStatusTimestamp;
+    }
+
+    /**
+     * @param \DateTime $deliveryStatusDateTime
+     * @return void
+     */
+    public function setDeliveryStatusDateTime(\DateTime $deliveryStatusDateTime)
+    {
+        $this->deliveryStatusTimestamp = $deliveryStatusDateTime->getTimestamp();
+    }
+
+    /**
+     * @return string
+     */
+    public function getMessageId()
+    {
+        return $this->messageId;
+    }
+
+    /**
+     * @param string $messageId
+     * @return void
+     */
+    public function setMessageId($messageId)
+    {
+        $this->messageId = (string)$messageId;
     }
 
     /**
@@ -302,11 +337,11 @@ class Sms
      */
     public function setSent($sent)
     {
-        $this->sent = $sent;
+        $this->sent = (boolean)$sent;
     }
 
     /**
-     * @return array
+     * @return string
      */
     public function getGatewayResponse()
     {
@@ -314,14 +349,13 @@ class Sms
     }
 
     /**
-     * @param array $gatewayResponse
+     * @param string $gatewayResponse
+     * @return void
      */
     public function setGatewayResponse($gatewayResponse)
     {
-        $this->gatewayResponse = $gatewayResponse;
+        $this->gatewayResponse = (string)$gatewayResponse;
     }
-
-    /* ********************[ SPECIAL METHODS ]******************** */
 
     /**
      * @return boolean

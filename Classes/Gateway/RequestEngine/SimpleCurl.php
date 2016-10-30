@@ -19,14 +19,12 @@ class SimpleCurl implements RequestEngineInterface
 {
 
     /**
-     *
-     *
-     * @param $url
-     * @param $getParameters
-     * @return string Response Body
+     * @param string $url
+     * @param array $getParameters
+     * @return string response body
      * @throws RequestEngineException
      */
-    public function get($url, $getParameters)
+    public function get($url, array $getParameters)
     {
         try {
             $request = new Request();
@@ -39,14 +37,12 @@ class SimpleCurl implements RequestEngineInterface
     }
 
     /**
-     *
-     *
-     * @param $url
-     * @param $postParameters
-     * @return string Response Body
+     * @param string $url
+     * @param array $postParameters
+     * @return string response body
      * @throws RequestEngineException
      */
-    public function post($url, $postParameters)
+    public function post($url, array $postParameters)
     {
         try {
             $request = new Request();

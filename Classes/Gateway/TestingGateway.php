@@ -24,7 +24,7 @@ class TestingGateway implements GatewayInterface
     );
 
     /**
-     * @var TestingGateway
+     * @var self
      */
     protected static $instance;
 
@@ -39,7 +39,7 @@ class TestingGateway implements GatewayInterface
     protected $gatewayResponse;
 
     /**
-     * @return TestingGateway
+     * @return self
      */
     public static function getInstance()
     {
@@ -50,7 +50,7 @@ class TestingGateway implements GatewayInterface
     }
 
     /**
-     * GatewayService constructor.
+     * TestingGateway constructor.
      */
     public function __construct()
     {
@@ -70,6 +70,7 @@ class TestingGateway implements GatewayInterface
 
     /**
      * @param string $gatewayResponse
+     * @return void
      */
     public function setGatewayResponse($gatewayResponse)
     {
@@ -77,13 +78,17 @@ class TestingGateway implements GatewayInterface
     }
 
     /**
-     * @param Sms $sms
-     * @return Sms
+     * @param Sms &$sms
+     * @return void
      */
-    public function send(Sms $sms)
+    public function send(Sms &$sms)
     {
-        if (empty($this->deliveryStatus) || ! in_array($this->deliveryStatus, self::AVAILABLE_DELIVERY_STATUSES)) {
+        if (empty($this->deliveryStatus) || !in_array($this->deliveryStatus, self::AVAILABLE_DELIVERY_STATUSES)) {
             $this->deliveryStatus = Sms::SMS_DELIVERY_STATUS_DELIVERED;
+        }
+
+        if (empty($this->gatewayResponse)) {
+            $this->gatewayResponse = '100';
         }
 
         $sms->setSent(true);
@@ -91,8 +96,6 @@ class TestingGateway implements GatewayInterface
         $sms->setDeliveryStatus($this->deliveryStatus);
         $sms->setMessageId(uniqid());
         $sms->setGatewayResponse($this->gatewayResponse);
-
-        return $sms;
     }
 
 }

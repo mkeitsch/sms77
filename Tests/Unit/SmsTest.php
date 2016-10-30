@@ -5,14 +5,21 @@ namespace MKcom\SMS77\Tests\Unit;
  * This file is part of the MKcom.SMS77 package.
  */
 
-use PHPUnit_Framework_TestCase;
 use MKcom\SMS77\Sms;
+use PHPUnit_Framework_TestCase;
 
+/**
+ * Class SmsTest
+ *
+ * @package MKcom\SMS77\Tests\Unit
+ */
 class SmsTest extends PHPUnit_Framework_TestCase
 {
 
     /**
      * @test
+     *
+     * @return void
      */
     public function smsCanBeCloned()
     {
