@@ -3,8 +3,6 @@ namespace MKcom\SMS77\Tests\Unit\Gateway;
 
 /*
  * This file is part of the MKcom.SMS77 package.
- *
- * TODO: PHPUnit can mock web services
  */
 
 use MKcom\SMS77\Gateway\Exception\Sms77HttpApiGatewayException;
@@ -14,6 +12,11 @@ use MKcom\SMS77\Sms;
 use PHPUnit_Framework_TestCase;
 use PHPUnit_Framework_MockObject_MockObject;
 
+/**
+ * Class HttpApiGatewayTest
+ *
+ * @package MKcom\SMS77\Tests\Unit\Gateway
+ */
 class HttpApiGatewayTest extends PHPUnit_Framework_TestCase
 {
 
@@ -23,15 +26,18 @@ class HttpApiGatewayTest extends PHPUnit_Framework_TestCase
     protected $httpApiGateway;
 
     /**
-     * @var PHPUnit_Framework_MockObject_MockObject
+     * @var PHPUnit_Framework_MockObject_MockObject|RequestEngineInterface
      */
     protected $requestEngine;
 
     /**
-     * @var PHPUnit_Framework_MockObject_MockObject
+     * @var PHPUnit_Framework_MockObject_MockObject|Sms
      */
     protected $sms;
 
+    /**
+     * @return void
+     */
     public function setUp()
     {
         parent::setUp();
@@ -40,14 +46,19 @@ class HttpApiGatewayTest extends PHPUnit_Framework_TestCase
         $this->sms->method('getRecipients')->willReturn(array());
 
         $this->requestEngine = $this->createMock(RequestEngineInterface::class);
-        $this->httpApiGateway = new HttpApiGateway($this->requestEngine, array(
-            'username' => 'the username',
-            'password' => 'the secret',
-        ));
+        $this->httpApiGateway = new HttpApiGateway(
+            $this->requestEngine,
+            array(
+                'username' => 'the username',
+                'password' => 'the secret',
+            )
+        );
     }
 
     /**
      * @test
+     *
+     * @return void
      */
     public function aSentSmsWillNotBeSentASecondTime()
     {
@@ -56,12 +67,12 @@ class HttpApiGatewayTest extends PHPUnit_Framework_TestCase
         $this->httpApiGateway->send($this->sms);
     }
 
-    /* ********************[ CONFIGURATION TESTS ]******************** */
-
     /**
      * @test
+     *
+     * @return void
      */
-    public function ifNoConfigurationHasBeenSetDefaultsAreUsed()
+    public function ifNoConfigurationHasBeenSetDefaultSettingsAreUsed()
     {
         $this->httpApiGateway = new HttpApiGateway($this->requestEngine);
 
@@ -87,6 +98,8 @@ class HttpApiGatewayTest extends PHPUnit_Framework_TestCase
 
     /**
      * @test
+     *
+     * @return void
      */
     public function ifSmsValuesHasNotBeenSetConfigurationIsUsed()
     {
@@ -123,6 +136,8 @@ class HttpApiGatewayTest extends PHPUnit_Framework_TestCase
 
     /**
      * @test
+     *
+     * @return void
      */
     public function ifSmsValuesHasBeenSetTheseAreUsed()
     {
@@ -155,10 +170,10 @@ class HttpApiGatewayTest extends PHPUnit_Framework_TestCase
         $this->httpApiGateway->send($this->sms);
     }
 
-    /* ********************[ POST PARAMETERS TESTS ]******************** */
-
     /**
      * @test
+     *
+     * @return void
      */
     public function postParametersAreNotSetIfDefault()
     {
@@ -185,7 +200,6 @@ class HttpApiGatewayTest extends PHPUnit_Framework_TestCase
         $this->requestEngine->expects($this->once())->method('post')->with('https://gateway.sms77.de/', array(
             'u'             => 'the username',
             'p'             => 'the secret',
-            // sms specific
             'to'            => '0177-555555,max,0177-8888',
             'text'          => 'test message',
         ))->willReturn("100");
@@ -197,6 +211,8 @@ class HttpApiGatewayTest extends PHPUnit_Framework_TestCase
 
     /**
      * @test
+     *
+     * @return void
      */
     public function postParametersAreSetIfNotDefault()
     {
@@ -224,7 +240,6 @@ class HttpApiGatewayTest extends PHPUnit_Framework_TestCase
             'return_msg_id' => 1,
             'no_reload'     => 1,
             'details'       => 1,
-            // sms specific
             'to'            => '0177-555555,max,0177-8888',
             'text'          => 'test message',
             'delay'         => '123456789',
@@ -243,6 +258,8 @@ class HttpApiGatewayTest extends PHPUnit_Framework_TestCase
 
     /**
      * @test
+     *
+     * @return void
      */
     public function exceptionWillBeThrownIfGatewayStatusNot100OnSend()
     {
@@ -251,11 +268,14 @@ class HttpApiGatewayTest extends PHPUnit_Framework_TestCase
         $this->expectExceptionCode(1475485924);
 
         $this->requestEngine->method('post')->willReturn('900');
+
         $this->httpApiGateway->send($this->sms);
     }
 
     /**
      * @test
+     *
+     * @return void
      */
     public function messageIdAndMessageStatusAndGatewayStatusWillBeUpdated()
     {
@@ -272,6 +292,8 @@ class HttpApiGatewayTest extends PHPUnit_Framework_TestCase
 
     /**
      * @test
+     *
+     * @return void
      */
     public function returnedCreditStatusIsParsedCorrectlyAsFloat()
     {
@@ -282,6 +304,8 @@ class HttpApiGatewayTest extends PHPUnit_Framework_TestCase
 
     /**
      * @test
+     *
+     * @return void
      */
     public function returnedCreditStatusAsErrorCodeThrowsException()
     {
@@ -298,8 +322,10 @@ class HttpApiGatewayTest extends PHPUnit_Framework_TestCase
 
     /**
      * @test
+     *
+     * @return void
      */
-    public function exceptionWillBeThrownIfGatewayStatusNot100OnGetMessageStatus()
+    public function exceptionWillBeThrownIfGatewayStatusNot100OnUpdateSmsStatus()
     {
         $this->expectException(Sms77HttpApiGatewayException::class);
         $this->expectExceptionMessage('900: Given credentials not valid');
@@ -317,13 +343,15 @@ class HttpApiGatewayTest extends PHPUnit_Framework_TestCase
             ))
             ->willReturn('900');
 
-        $this->httpApiGateway->getMessageStatus($this->sms);
+        $this->httpApiGateway->updateSmsStatus($this->sms);
     }
 
     /**
      * @test
+     *
+     * @return void
      */
-    public function messageStatusWillBeUpdated()
+    public function smsStatusWillBeUpdated()
     {
         $this->sms->expects($this->once())->method('getMessageId')->willReturn('182734685');
         $this->sms->expects($this->once())->method('setDeliveryStatus')->with('NOTDELIVERED');
@@ -339,7 +367,7 @@ class HttpApiGatewayTest extends PHPUnit_Framework_TestCase
             ))
             ->willReturn("NOTDELIVERED\n987654321");
 
-        $this->httpApiGateway->getMessageStatus($this->sms);
+        $this->httpApiGateway->updateSmsStatus($this->sms);
     }
 
 }

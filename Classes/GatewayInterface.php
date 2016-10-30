@@ -14,11 +14,11 @@ interface GatewayInterface
 {
 
     /**
-     * Sends the SMS
+     * Sends a SMS
      *
-     * @param Sms $sms
-     * @return Sms
+     * @param Sms &$sms
+     * @return void
      */
-    public function send(Sms $sms);
+    public function send(Sms &$sms);
 
 }
