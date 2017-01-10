@@ -1,0 +1,39 @@
+#############################################
+# Simple SMS
+
+100
+
+#############################################
+# SMS with return_msg_id=1
+
+100
+123456
+
+#############################################
+# SMS with details=1
+
+100
+Verbucht: 0
+Preis: 0.029
+Guthaben: 76.60839844
+Text: Das ist ein Test
+SMS-Typ: basicplus
+Flash SMS: off
+Encoding: ASCII
+GSM0338: true
+Debug: true
+
+#############################################
+# SMS with details=1&return_msg_id=1
+
+100
+123456
+Verbucht: 0
+Preis: 0.029
+Guthaben: 76.60839844
+Text: Das ist ein Test
+SMS-Typ: basicplus
+Flash SMS: off
+Encoding: ASCII
+GSM0338: true
+Debug: true

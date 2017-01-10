@@ -265,27 +265,9 @@ class HttpApiGatewayTest extends PHPUnit_Framework_TestCase
     {
         $this->expectException(Sms77HttpApiGatewayException::class);
         $this->expectExceptionMessage('900: Given credentials not valid');
-        $this->expectExceptionCode(1475485924);
+        $this->expectExceptionCode(1484052369);
 
         $this->requestEngine->method('post')->willReturn('900');
-
-        $this->httpApiGateway->send($this->sms);
-    }
-
-    /**
-     * @test
-     *
-     * @return void
-     */
-    public function messageIdAndMessageStatusAndGatewayStatusWillBeUpdated()
-    {
-        $this->sms->expects($this->once())->method('setMessageId')->with('837592745');
-        $this->sms->expects($this->once())->method('setGatewayResponse')->with("100\n837592745\na field\nanother field\nand another field");
-        $this->sms->expects($this->once())->method('setDeliveryStatus')->with('NOTDELIVERED');
-        $this->sms->expects($this->once())->method('setDeliveryStatusTimestamp')->with('987654321');
-
-        $this->requestEngine->method('post')->willReturn("100\n837592745\na field\nanother field\nand another field");
-        $this->requestEngine->method('get')->with('https://gateway.sms77.de/status.php')->willReturn("NOTDELIVERED\n987654321");
 
         $this->httpApiGateway->send($this->sms);
     }
