@@ -338,26 +338,24 @@ class HttpApiGateway implements GatewayInterface
             )
         );
 
-        if (is_numeric($responseContent)) {
-            $responseContent = (int)$responseContent;
-            if ($responseContent !== 100 && in_array($responseContent, static::SMS77_HTTP_API_GATEWAY_STATUS_CODES)) {
-                throw new Sms77HttpApiGatewayException(static::SMS77_HTTP_API_GATEWAY_STATUS_CODES[$responseContent], 1475574023);
+        $explodedResponseContent = explode("\n", $responseContent);
+        $responseCode = $explodedResponseContent[0];
+
+        if (is_numeric($responseCode)) {
+            $responseCode = (int)$responseCode;
+            if (in_array($responseCode, static::SMS77_HTTP_API_GATEWAY_STATUS_CODES)) {
+                throw new Sms77HttpApiGatewayException(static::SMS77_HTTP_API_GATEWAY_STATUS_CODES[$responseCode], 1475574023);
             } else {
-                throw new \Exception('Response parsing error', 1475574032);
+                throw new \Exception('Response parsing error! Unknown response code: ' . $responseCode, 1475574032);
             }
-        } elseif (strpos($responseContent, "\n") !== false) {
-            $responseContentExploded = explode("\n", $responseContent);
-
-            $deliveryStatus = $responseContentExploded[0];
-            $deliveryStatusTimestamp = $responseContentExploded[1];
-        } elseif (empty($responseContent)) {
-            throw new \Exception('Response is empty', 1477317469);
         } else {
-            throw new \Exception('Response parsing error', 1475574038);
+            try {
+                $sms->setDeliveryStatus($explodedResponseContent[0]);
+                $sms->setDeliveryStatusTimestamp($explodedResponseContent[1]);
+            } catch (\Exception $e) {
+                throw new \Exception("Response parsing error! Error: " . $e->getMessage() . "\nUnexpected response: " . var_export($explodedResponseContent, TRUE), 1484053759);
+            }
         }
-
-        $sms->setDeliveryStatus($deliveryStatus);
-        $sms->setDeliveryStatusTimestamp($deliveryStatusTimestamp);
     }
 
     /**
