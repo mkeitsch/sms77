@@ -43,7 +43,7 @@ class HttpApiGatewayTest extends PHPUnit_Framework_TestCase
     {
         // Read credentials from file
         {
-            $path = '.' . DIRECTORY_SEPARATOR . 'credentials.txt';
+            $path = __DIR__ . DIRECTORY_SEPARATOR . 'credentials.txt';
             if (!file_exists($path)) {
                 $this->markTestIncomplete('To use this test, please create a file named "credentials.txt" in the same directory of this test file with your SMS77 API credentials formatted like: username:password');
             }
